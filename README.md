@@ -1,7 +1,7 @@
 # <strong>AFAIKs (Smart Collaborative To-Do List)</strong>
 
 Deskripsi
-
+---
 Smart Collaborative To-Do List adalah aplikasi manajemen tugas berbasis web yang dikembangkan menggunakan Python. Aplikasi ini membantu pengguna mengelola tugas secara terstruktur, efisien, dan kolaboratif. Sistem ini tidak hanya mencatat tugas, tetapi juga mendukung pengingat otomatis, pengelompokan tugas berdasarkan kategori dan prioritas, serta analisis produktivitas pengguna.
 
 Aplikasi memungkinkan pengguna untuk membuat, mengedit, dan memantau tugas dengan tenggat waktu (deadline) serta prioritas tertentu. Fitur kolaborasi memungkinkan tugas dibagikan dan dikerjakan bersama dalam satu workspace, sehingga cocok untuk digunakan oleh mahasiswa, pekerja tim, maupun individu yang ingin meningkatkan manajemen waktu dan produktivitas.
