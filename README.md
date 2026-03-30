@@ -17,7 +17,16 @@ Memantau progres dan produktivitas secara berkala
 
 Secara keseluruhan, project ini memberikan solusi digital yang praktis dan bermanfaat untuk mendukung aktivitas akademik maupun profesional.
 
+Who Are We?
+---
+Kami adalah mahasiswa dari Universitas Mikroskil yang beranggotakan:
+- 241110272 - Julius Einstein Chandra
+- 241110995 - Romario Satyo
+- 241111131 - William Tonata
+- 241110357 - Felixander Ting
+
 Fitur Utama
+---
 1. Registrasi dan login pengguna
 2. Manajemen profil pengguna
 3. Membuat, mengedit, dan menghapus tugas
@@ -38,13 +47,15 @@ Fitur Utama
 18. UI/UX sederhana dan responsif
 
 Timeline Pengembangan (Agile Sprint)
-- Sprint 1 (MVP, 1 minggu): Registrasi & login, CRUD task, deadline, prioritas
-- Sprint 2 (Core, 1 minggu): Kategori/tagging, search/filter, reminder, status tracking
-- Sprint 3 (Enhancement, 1 minggu): Kolaborasi, assign task, dashboard statistik, grafik produktivitas
-- Sprint 4 (Refinement, 1 minggu): Export PDF/CSV, dark mode, email notification, penyempurnaan UI/UX
+---
+- Sprint 1 : Registrasi & login, CRUD task, deadline, prioritas
+- Sprint 2 : Kategori/tagging, search/filter, reminder, status tracking
+- Sprint 3 : Kolaborasi, assign task, dashboard statistik, grafik produktivitas
+- Sprint 4 : Export PDF/CSV, dark mode, email notification, penyempurnaan UI/UX
 
-Teknologi yang Digunakan
-- Backend: Python (Flask atau Django)
+Languages
+---
+- Backend: Python (Flask/Django)
 - Frontend: HTML, CSS, JavaScript
-- Database: SQLite (awal), PostgreSQL (opsional)
-- Library tambahan: Chart.js (grafik), SMTP/Email API (notifikasi)
+- Database: SQLite
+- Additional Library: Chart.js (graph), SMTP/Email API (Notification)
