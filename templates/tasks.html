@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Tugas - AFAIKs{% endblock %}
+{% block content %}
+<h1>Daftar Tugas</h1>
+<div class="toolbar">
+    <a class="button" href="{{ url_for('new_task') }}">Tambah Tugas</a>
+    <a class="button secondary" href="{{ url_for('export_csv') }}">Export CSV</a>
+    <a class="button secondary" href="{{ url_for('export_pdf') }}">Export PDF</a>
+</div>
+<div class="card">
+    <form method="post" class="filter-form">
+        {{ form.hidden_tag() }}
+        {{ form.search(class='input-field', placeholder='Cari judul atau deskripsi') }}
+        {{ form.category(class='input-field', placeholder='Kategori') }}
+        {{ form.priority(class='select-field') }}
+        {{ form.status(class='select-field') }}
+        {{ form.submit(class='button small') }}
+    </form>
+</div>
+<div class="card">
+    <table>
+        <thead><tr><th>Judul</th><th>Kategori</th><th>Deadline</th><th>Prioritas</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.category }}</td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
+                    <td>{{ task.priority }}</td>
+                    <td>{{ task.status }}</td>
+                    <td class="actions">
+                        <a class="button small" href="{{ url_for('edit_task', task_id=task.id) }}">Edit</a>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" class="inline-form">
+                            <button type="submit" class="button small danger">Hapus</button>
+                        </form>
+                        <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="post" class="inline-form">
+                            <button type="submit" class="button small">Toggle</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">Tidak ada tugas yang sesuai.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

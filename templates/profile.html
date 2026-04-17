@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Profil - AFAIKs{% endblock %}
+{% block content %}
+<h1>Profil</h1>
+<div class="card">
+    <p><strong>Username:</strong> {{ current_user.username }}</p>
+    <p><strong>Email:</strong> {{ current_user.email }}</p>
+</div>
+<div class="card">
+    <h2>Tugas yang Dibagikan</h2>
+    <table>
+        <thead><tr><th>Judul</th><th>Status</th><th>Deadline</th><th>Owner</th></tr></thead>
+        <tbody>
+            {% for task in shared_tasks %}
+                <tr>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
+                    <td>{{ task.owner.username }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Belum ada tugas yang dibagikan.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

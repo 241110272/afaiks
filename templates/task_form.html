@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} - AFAIKs{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>{{ title }}</h1>
+    <form method="post" class="task-form">
+        {{ form.hidden_tag() }}
+        <label>Judul</label>
+        {{ form.title(class='input-field') }}
+        <label>Deskripsi</label>
+        {{ form.description(class='textarea-field') }}
+        <label>Deadline</label>
+        {{ form.deadline(class='input-field') }}
+        <label>Prioritas</label>
+        {{ form.priority(class='select-field') }}
+        <label>Status</label>
+        {{ form.status(class='select-field') }}
+        <label>Kategori</label>
+        {{ form.category(class='input-field') }}
+        <label>Tags</label>
+        {{ form.tags(class='input-field') }}
+        <label>Assign ke</label>
+        {{ form.assignee(class='select-field') }}
+        {{ form.submit(class='button') }}
+    </form>
+</div>
+{% endblock %}

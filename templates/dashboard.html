@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - AFAIKs{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="card-grid">
+    <div class="card small-card"><strong>Total Tugas</strong><span>{{ total }}</span></div>
+    <div class="card small-card"><strong>Selesai</strong><span>{{ completed }}</span></div>
+    <div class="card small-card"><strong>Pending</strong><span>{{ pending }}</span></div>
+</div>
+<div class="card">
+    <h2>Ringkasan Prioritas</h2>
+    <ul class="summary-list">
+        {% for label, value in priorities.items() %}
+            <li>{{ label }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="card">
+    <h2>Ringkasan Kategori</h2>
+    <ul class="summary-list">
+        {% for label, value in categories.items() %}
+            <li>{{ label }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="card">
+    <h2>Tugas Terbaru</h2>
+    <table>
+        <thead><tr><th>Judul</th><th>Status</th><th>Deadline</th><th>Prioritas</th></tr></thead>
+        <tbody>
+            {% for task in tasks[:8] %}
+                <tr>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.status }}</td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
+                    <td>{{ task.priority }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Tidak ada tugas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="card-actions">
+        <a class="button" href="{{ url_for('tasks') }}">Lihat semua tugas</a>
+        <a class="button secondary" href="{{ url_for('notify') }}">Kirim Notifikasi Email</a>
+    </div>
+</div>
+{% endblock %}

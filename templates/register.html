@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Register - AFAIKs{% endblock %}
+{% block content %}
+<div class="card auth-card">
+    <h2>Register</h2>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <label for="username">Username</label>
+        {{ form.username(class='input-field') }}
+        <label for="email">Email</label>
+        {{ form.email(class='input-field') }}
+        <label for="password">Password</label>
+        {{ form.password(class='input-field') }}
+        <label for="confirm_password">Confirm Password</label>
+        {{ form.confirm_password(class='input-field') }}
+        {{ form.submit(class='button') }}
+    </form>
+    <p>Sudah punya akun? <a href="{{ url_for('login') }}">Masuk</a>.</p>
+</div>
+{% endblock %}

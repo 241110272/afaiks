@@ -1,0 +1,182 @@
+body {
+    margin: 0;
+    font-family: Inter, system-ui, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+body.dark {
+    background: #111827;
+    color: #e5e7eb;
+}
+
+.container {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+.topbar {
+    background: #2563eb;
+    color: #fff;
+    padding: 1rem 0;
+}
+
+.topbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+}
+
+nav a,
+.theme-toggle {
+    color: #fff;
+    margin-left: 1rem;
+    text-decoration: none;
+}
+
+.theme-toggle {
+    border: 1px solid rgba(255,255,255,0.7);
+    background: transparent;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.card, .auth-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 15px 40px rgba(15,23,42,0.08);
+}
+
+body.dark .card,
+body.dark .auth-card {
+    background: #1f2937;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.small-card {
+    text-align: center;
+}
+
+.small-card span {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+h1, h2 {
+    margin-top: 0;
+}
+
+.table, table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(15,23,42,0.08);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.button,
+.button.small {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.button.secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.button.danger {
+    background: #ef4444;
+}
+
+.button.small {
+    padding: 0.5rem 0.75rem;
+}
+
+.input-field,
+.select-field,
+.textarea-field {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background: #fff;
+    color: inherit;
+}
+
+textarea.textarea-field {
+    min-height: 140px;
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    align-items: end;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.flash-messages .alert {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.alert-success { background: #dcfce7; color: #166534; }
+.alert-danger { background: #fee2e2; color: #991b1b; }
+.alert-warning { background: #fef3c7; color: #713f12; }
+.alert-info { background: #dbeafe; color: #1e3a8a; }
+
+.footer {
+    text-align: center;
+    padding: 1rem 0;
+    color: #6b7280;
+}
+
+body.dark .topbar { background: #111827; }
+body.dark nav a,
+body.dark .theme-toggle { color: #e5e7eb; }
+body.dark .button.secondary { background: #374151; color: #e5e7eb; }
+body.dark .button { background: #2563eb; }
+body.dark table th,
+body.dark table td { border-color: rgba(255,255,255,0.08); }
+body.dark .card { background: #111827; }
