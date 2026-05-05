@@ -102,7 +102,9 @@ const chartData = {
         'High': {{ priorities.get('High', 0) }}
     },
     categories: {
-        {% for key, value in categories.items() %}'{{ key }}': {{ value }}{{ "," if not loop.last else "" }}{% endfor %}
+        {% for key, value in categories.items() -%}
+        '{{ key }}': {{ value }}{% if not loop.last %},{% endif %}
+        {% endfor -%}
     }
 };
 
