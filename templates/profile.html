@@ -1,27 +1,56 @@
 {% extends 'base.html' %}
-{% block title %}Profil - AFAIKs{% endblock %}
+{% block title %}Profile - AFAIKs{% endblock %}
 {% block content %}
-<h1>Profil</h1>
+<h1>👤 My Profile</h1>
+<p style="color: var(--text-secondary); margin-top: -0.5rem;">View your account information and shared tasks</p>
+
 <div class="card">
-    <p><strong>Username:</strong> {{ current_user.username }}</p>
-    <p><strong>Email:</strong> {{ current_user.email }}</p>
+    <h2>Account Information</h2>
+    <div style="display: grid; gap: 1rem;">
+        <div>
+            <label style="color: var(--text-secondary); font-size: 0.9rem;">Username</label>
+            <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">{{ current_user.username }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-secondary); font-size: 0.9rem;">Email Address</label>
+            <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">{{ current_user.email }}</p>
+        </div>
+    </div>
 </div>
+
 <div class="card">
-    <h2>Tugas yang Dibagikan</h2>
+    <h2>📤 Shared Tasks</h2>
+    {% if shared_tasks %}
     <table>
-        <thead><tr><th>Judul</th><th>Status</th><th>Deadline</th><th>Owner</th></tr></thead>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Deadline</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
         <tbody>
             {% for task in shared_tasks %}
                 <tr>
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.status }}</td>
-                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
+                    <td><strong>{{ task.title }}</strong></td>
+                    <td>
+                        {% if task.status == 'Completed' %}
+                            <span style="color: var(--success);">✓ {{ task.status }}</span>
+                        {% else %}
+                            <span>{{ task.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '—' }}</td>
                     <td>{{ task.owner.username }}</td>
                 </tr>
-            {% else %}
-                <tr><td colspan="4">Belum ada tugas yang dibagikan.</td></tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p style="text-align: center; color: var(--text-secondary); padding: 2rem 0;">
+        No shared tasks yet.
+    </p>
+    {% endif %}
 </div>
 {% endblock %}

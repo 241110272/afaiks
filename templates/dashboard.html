@@ -1,36 +1,37 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard - AFAIKs{% endblock %}
 {% block content %}
-<h1>Dashboard Produktivitas</h1>
+<h1>📊 Productivity Dashboard</h1>
+<p style="color: var(--text-secondary); margin-top: -0.5rem;">Overview of your tasks and performance</p>
 
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="label">Total Tugas</div>
+        <div class="label">Total Tasks</div>
         <div class="value">{{ total }}</div>
     </div>
     <div class="stat-card completed">
-        <div class="label">Selesai</div>
+        <div class="label">✓ Completed</div>
         <div class="value">{{ completed }}</div>
     </div>
     <div class="stat-card pending">
-        <div class="label">Pending</div>
+        <div class="label">⏳ Pending</div>
         <div class="value">{{ pending }}</div>
     </div>
     <div class="stat-card high">
-        <div class="label">Tinggi</div>
+        <div class="label">🔴 High Priority</div>
         <div class="value">{{ priorities.get('High', 0) }}</div>
     </div>
 </div>
 
 <div class="card-grid">
     <div class="card">
-        <h2>Status Tugas</h2>
+        <h2>Task Status Overview</h2>
         <div class="chart-container">
             <canvas id="statusChart"></canvas>
         </div>
     </div>
     <div class="card">
-        <h2>Distribusi Prioritas</h2>
+        <h2>Priority Distribution</h2>
         <div class="chart-container">
             <canvas id="priorityChart"></canvas>
         </div>
@@ -38,56 +39,82 @@
 </div>
 
 <div class="card">
-    <h2>Tugas Berdasarkan Kategori</h2>
+    <h2>Tasks by Category</h2>
     <div class="chart-container" style="height: 400px;">
         <canvas id="categoryChart"></canvas>
     </div>
 </div>
 
 <div class="card">
-    <h2>Tugas Overdue</h2>
+    <h2>⚠️ Overdue Tasks</h2>
+    {% set overdue_tasks = [] %}
+    {% for task in tasks %}
+        {% if task.deadline and task.deadline < now and task.status == 'Pending' %}
+            {% set _ = overdue_tasks.append(task) %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if overdue_tasks %}
     <table>
-        <thead><tr><th>Judul</th><th>Deadline</th><th>Prioritas</th><th>Kategori</th></tr></thead>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Deadline</th>
+                <th>Priority</th>
+                <th>Category</th>
+            </tr>
+        </thead>
         <tbody>
-            {% set overdue_tasks = [] %}
-            {% for task in tasks %}
-                {% if task.deadline and task.deadline < now and task.status == 'Pending' %}
-                    {% set _ = overdue_tasks.append(task) %}
-                    <tr>
-                        <td><strong>{{ task.title }}</strong></td>
-                        <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
-                        <td>{{ task.priority }}</td>
-                        <td>{{ task.category }}</td>
-                    </tr>
-                {% endif %}
+            {% for task in overdue_tasks %}
+                <tr>
+                    <td><strong>{{ task.title }}</strong></td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ task.priority }}</td>
+                    <td>{{ task.category }}</td>
+                </tr>
             {% endfor %}
-            {% if not overdue_tasks %}
-                <tr><td colspan="4">Tidak ada tugas overdue.</td></tr>
-            {% endif %}
         </tbody>
     </table>
+    {% else %}
+    <p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">
+        ✓ Great! No overdue tasks.
+    </p>
+    {% endif %}
 </div>
 
 <div class="card">
-    <h2>Tugas Terbaru</h2>
+    <h2>Latest Tasks</h2>
+    {% if tasks %}
     <table>
-        <thead><tr><th>Judul</th><th>Status</th><th>Deadline</th><th>Prioritas</th></tr></thead>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Deadline</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
         <tbody>
             {% for task in tasks[:8] %}
                 <tr>
                     <td>{{ task.title }}</td>
                     <td>{{ task.status }}</td>
-                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '—' }}</td>
                     <td>{{ task.priority }}</td>
                 </tr>
-            {% else %}
-                <tr><td colspan="4">Tidak ada tugas.</td></tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">
+        No tasks yet. Create one to get started!
+    </p>
+    {% endif %}
+    
     <div class="card-actions">
-        <a class="button" href="{{ url_for('tasks') }}">Lihat semua tugas</a>
-        <a class="button secondary" href="{{ url_for('notify') }}">Kirim Notifikasi Email</a>
+        <a class="button" href="{{ url_for('tasks') }}">View All Tasks</a>
+        <a class="button secondary" href="{{ url_for('new_task') }}">➕ Create New Task</a>
+        <a class="button secondary" href="{{ url_for('notify') }}">📧 Send Email Notification</a>
     </div>
 </div>
 
@@ -95,11 +122,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const chartColors = {
-        primary: '#2563eb',
+        primary: '#6366f1',
         success: '#10b981',
         danger: '#ef4444',
         warning: '#f59e0b',
-        info: '#06b6d4'
+        info: '#06b6d4',
+        purple: '#8b5cf6'
     };
 
     const chartData = {
@@ -123,17 +151,20 @@ document.addEventListener('DOMContentLoaded', function() {
         new Chart(statusCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Selesai', 'Pending'],
+                labels: ['Completed', 'Pending'],
                 datasets: [{
                     data: [chartData.completed, chartData.pending],
                     backgroundColor: [chartColors.success, chartColors.warning],
-                    borderColor: '#fff'
+                    borderColor: '#fff',
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                plugins: { legend: { position: 'bottom' } }
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true } }
+                }
             }
         });
     }
@@ -146,17 +177,19 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: ['Low', 'Medium', 'High'],
                 datasets: [{
-                    label: 'Jumlah Tugas',
+                    label: 'Number of Tasks',
                     data: [chartData.priorities.Low, chartData.priorities.Medium, chartData.priorities.High],
-                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                    borderRadius: 5
+                    backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger],
+                    borderRadius: 8,
+                    borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
                 indexAxis: 'y',
-                scales: { x: { beginAtZero: true } }
+                scales: { x: { beginAtZero: true } },
+                plugins: { legend: { display: false } }
             }
         });
     }
@@ -166,6 +199,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryCtx = document.getElementById('categoryChart').getContext('2d');
         const categoryLabels = Object.keys(chartData.categories);
         const categoryValues = Object.values(chartData.categories);
+        const categoryColors = [
+            chartColors.primary, chartColors.purple, chartColors.success,
+            chartColors.danger, chartColors.warning, chartColors.info
+        ];
         
         if (categoryLabels.length > 0) {
             new Chart(categoryCtx, {
@@ -173,17 +210,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: {
                     labels: categoryLabels,
                     datasets: [{
-                        label: 'Tugas per Kategori',
+                        label: 'Tasks per Category',
                         data: categoryValues,
-                        backgroundColor: [chartColors.primary, chartColors.success, chartColors.danger, chartColors.warning, chartColors.info],
-                        borderRadius: 5
+                        backgroundColor: categoryColors.slice(0, categoryLabels.length),
+                        borderRadius: 8,
+                        borderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     indexAxis: 'x',
-                    scales: { y: { beginAtZero: true } }
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
                 }
             });
         }

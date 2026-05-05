@@ -1,74 +1,94 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }} - AFAIKs{% endblock %}
 {% block content %}
-<div class="card">
+<div class="card task-form">
     <h1>{{ title }}</h1>
-    <form method="post" class="task-form" novalidate>
+    <p style="color: var(--text-secondary); margin-top: -0.5rem;">
+        {% if 'Create' in title %}Fill in the details for your new task{% else %}Update your task information{% endif %}
+    </p>
+    
+    <form method="post" novalidate>
         {{ form.hidden_tag() }}
         
-        <label>Judul</label>
-        {{ form.title(class='input-field') }}
-        {% if form.title.errors %}
-            <div class="error-message">
-                {% for error in form.title.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="title">📌 Title</label>
+            {{ form.title(class='input-field', placeholder='Enter task title') }}
+            {% if form.title.errors %}
+                <div class="error-message">
+                    {% for error in form.title.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Deskripsi</label>
-        {{ form.description(class='textarea-field') }}
-        {% if form.description.errors %}
-            <div class="error-message">
-                {% for error in form.description.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="description">📝 Description</label>
+            {{ form.description(class='textarea-field', placeholder='Add task description...') }}
+            {% if form.description.errors %}
+                <div class="error-message">
+                    {% for error in form.description.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Deadline</label>
-        {{ form.deadline(class='input-field') }}
-        {% if form.deadline.errors %}
-            <div class="error-message">
-                {% for error in form.deadline.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="deadline">📅 Deadline</label>
+            {{ form.deadline(class='input-field', type='date') }}
+            {% if form.deadline.errors %}
+                <div class="error-message">
+                    {% for error in form.deadline.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Prioritas</label>
-        {{ form.priority(class='select-field') }}
-        {% if form.priority.errors %}
-            <div class="error-message">
-                {% for error in form.priority.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="priority">🎯 Priority</label>
+            {{ form.priority(class='select-field') }}
+            {% if form.priority.errors %}
+                <div class="error-message">
+                    {% for error in form.priority.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Status</label>
-        {{ form.status(class='select-field') }}
-        {% if form.status.errors %}
-            <div class="error-message">
-                {% for error in form.status.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="status">✓ Status</label>
+            {{ form.status(class='select-field') }}
+            {% if form.status.errors %}
+                <div class="error-message">
+                    {% for error in form.status.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Kategori</label>
-        {{ form.category(class='input-field') }}
-        {% if form.category.errors %}
-            <div class="error-message">
-                {% for error in form.category.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="category">🏷️ Category</label>
+            {{ form.category(class='input-field', placeholder='e.g., Work, Personal, Learning') }}
+            {% if form.category.errors %}
+                <div class="error-message">
+                    {% for error in form.category.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Tags</label>
-        {{ form.tags(class='input-field') }}
-        {% if form.tags.errors %}
-            <div class="error-message">
-                {% for error in form.tags.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="tags">🏷️ Tags</label>
+            {{ form.tags(class='input-field', placeholder='Comma-separated tags') }}
+            {% if form.tags.errors %}
+                <div class="error-message">
+                    {% for error in form.tags.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
-        <label>Assign ke</label>
-        {{ form.assignee(class='select-field') }}
-        {% if form.assignee.errors %}
-            <div class="error-message">
-                {% for error in form.assignee.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="assignee">👤 Assign To</label>
+            {{ form.assignee(class='select-field') }}
+            {% if form.assignee.errors %}
+                <div class="error-message">
+                    {% for error in form.assignee.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
         {{ form.submit(class='button') }}
     </form>

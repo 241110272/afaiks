@@ -1,47 +1,85 @@
 {% extends 'base.html' %}
-{% block title %}Tugas - AFAIKs{% endblock %}
+{% block title %}Tasks - AFAIKs{% endblock %}
 {% block content %}
-<h1>Daftar Tugas</h1>
+<h1>📝 My Tasks</h1>
+<p style="color: var(--text-secondary); margin-top: -0.5rem;">Manage and organize your daily tasks</p>
+
 <div class="toolbar">
-    <a class="button" href="{{ url_for('new_task') }}">Tambah Tugas</a>
-    <a class="button secondary" href="{{ url_for('export_csv') }}">Export CSV</a>
-    <a class="button secondary" href="{{ url_for('export_pdf') }}">Export PDF</a>
+    <a class="button" href="{{ url_for('new_task') }}">➕ Add New Task</a>
+    <a class="button secondary" href="{{ url_for('export_csv') }}">📥 Export to CSV</a>
+    <a class="button secondary" href="{{ url_for('export_pdf') }}">📄 Export to PDF</a>
 </div>
+
 <div class="card">
+    <h2>🔍 Filter Tasks</h2>
     <form method="post" class="filter-form">
         {{ form.hidden_tag() }}
-        {{ form.search(class='input-field', placeholder='Cari judul atau deskripsi') }}
-        {{ form.category(class='input-field', placeholder='Kategori') }}
+        {{ form.search(class='input-field', placeholder='Search by title or description...') }}
+        {{ form.category(class='input-field', placeholder='Category') }}
         {{ form.priority(class='select-field') }}
         {{ form.status(class='select-field') }}
-        {{ form.submit(class='button small') }}
+        {{ form.submit(class='button small', value='Apply Filters') }}
     </form>
 </div>
+
 <div class="card">
+    {% if tasks %}
     <table>
-        <thead><tr><th>Judul</th><th>Kategori</th><th>Deadline</th><th>Prioritas</th><th>Status</th><th>Aksi</th></tr></thead>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Deadline</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
         <tbody>
             {% for task in tasks %}
                 <tr>
-                    <td>{{ task.title }}</td>
+                    <td><strong>{{ task.title }}</strong></td>
                     <td>{{ task.category }}</td>
-                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
-                    <td>{{ task.priority }}</td>
-                    <td>{{ task.status }}</td>
+                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '—' }}</td>
+                    <td>
+                        <span style="font-weight: 600;">
+                            {% if task.priority == 'High' %}
+                                🔴 {{ task.priority }}
+                            {% elif task.priority == 'Medium' %}
+                                🟡 {{ task.priority }}
+                            {% else %}
+                                🟢 {{ task.priority }}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if task.status == 'Completed' %}
+                            <span style="color: var(--success); font-weight: 600;">✓ {{ task.status }}</span>
+                        {% elif task.status == 'Pending' %}
+                            <span style="color: var(--warning); font-weight: 600;">⏳ {{ task.status }}</span>
+                        {% else %}
+                            <span style="color: var(--info); font-weight: 600;">→ {{ task.status }}</span>
+                        {% endif %}
+                    </td>
                     <td class="actions">
-                        <a class="button small" href="{{ url_for('edit_task', task_id=task.id) }}">Edit</a>
-                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" class="inline-form">
-                            <button type="submit" class="button small danger">Hapus</button>
-                        </form>
+                        <a class="button small" href="{{ url_for('edit_task', task_id=task.id) }}">✏️ Edit</a>
                         <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="post" class="inline-form">
-                            <button type="submit" class="button small">Toggle</button>
+                            <button type="submit" class="button small secondary">↻ Toggle</button>
+                        </form>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" class="inline-form" onclick="return confirm('Are you sure?');">
+                            <button type="submit" class="button small danger">🗑️ Delete</button>
                         </form>
                     </td>
                 </tr>
-            {% else %}
-                <tr><td colspan="6">Tidak ada tugas yang sesuai.</td></tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div style="text-align: center; padding: 3rem 1rem;">
+        <p style="font-size: 3rem; margin: 0;">📭</p>
+        <p style="color: var(--text-secondary); margin-top: 1rem;">No tasks match your filters.</p>
+        <a class="button" href="{{ url_for('new_task') }}" style="margin-top: 1rem;">Create your first task</a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

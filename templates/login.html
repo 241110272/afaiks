@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
 {% block title %}Login - AFAIKs{% endblock %}
 {% block content %}
-<div class="card auth-card">
-    <h2>Login</h2>
+<div class="auth-card">
+    <h2>Welcome Back</h2>
+    <p style="text-align: center; color: var(--text-secondary); margin-top: -0.5rem;">Sign in to your account</p>
+    
     <form method="post" novalidate>
         {{ form.hidden_tag() }}
-        <label for="email">Email</label>
-        {{ form.email(class='input-field') }}
-        {% if form.email.errors %}
-            <div class="error-message">
-                {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
         
-        <label for="password">Password</label>
-        {{ form.password(class='input-field') }}
-        {% if form.password.errors %}
-            <div class="error-message">
-                {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
-            </div>
-        {% endif %}
+        <div>
+            <label for="email">📧 Email Address</label>
+            {{ form.email(class='input-field', placeholder='your@email.com', autocomplete='email') }}
+            {% if form.email.errors %}
+                <div class="error-message">
+                    {% for error in form.email.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="password">🔐 Password</label>
+            {{ form.password(class='input-field', placeholder='••••••••', autocomplete='current-password') }}
+            {% if form.password.errors %}
+                <div class="error-message">
+                    {% for error in form.password.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
         
         {{ form.submit(class='button') }}
     </form>
-    <p>Belum punya akun? <a href="{{ url_for('register') }}">Daftar sekarang</a>.</p>
+    
+    <p style="text-align: center; margin-top: 1.5rem;">
+        Don't have an account? <a href="{{ url_for('register') }}">Create one now</a>
+    </p>
 </div>
 {% endblock %}
