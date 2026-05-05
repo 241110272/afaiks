@@ -7,8 +7,18 @@ class Config:
     # Security - Generate secure key if not set (development only)
     SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
     
-    # Database
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'data.db'))
+    # Database - Use environment variable or in-memory for Vercel
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url and database_url.startswith('sqlite://'):
+        # Use in-memory database for Vercel (file system is ephemeral)
+        if os.environ.get('FLASK_ENV') == 'production':
+            SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+        else:
+            SQLALCHEMY_DATABASE_URI = database_url
+    else:
+        # Use provided database URL or default SQLite
+        SQLALCHEMY_DATABASE_URI = database_url or ('sqlite:///' + os.path.join(basedir, 'data.db'))
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Mail Configuration
