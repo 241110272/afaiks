@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Kesalahan - AFAIKs{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 3rem auto; text-align: center;">
+    <h1 style="color: #ef4444; font-size: 3rem; margin-bottom: 1rem;">⚠️</h1>
+    <h2>Terjadi Kesalahan</h2>
+    <p style="font-size: 1.1rem; color: #666;">{{ error }}</p>
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('dashboard') }}" class="button">Kembali ke Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 import io
 import os
+import logging
 import smtplib
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
@@ -17,6 +18,11 @@ from models import Task, User, db
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Setup logging
+if not app.debug:
+    logging.basicConfig(level=logging.INFO)
+    app.logger.setLevel(logging.INFO)
+
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -28,6 +34,17 @@ def load_user(user_id):
 def create_database():
     with app.app_context():
         db.create_all()
+
+# Error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error='Halaman tidak ditemukan'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    app.logger.error(f'Server error: {error}')
+    return render_template('error.html', error='Terjadi kesalahan server'), 500
 
 def send_email(recipient, subject, body):
     if not app.config['MAIL_USERNAME'] or not app.config['MAIL_PASSWORD']:
@@ -104,11 +121,7 @@ def dashboard():
         priorities[task.priority] = priorities.get(task.priority, 0) + 1
         categories[task.category] = categories.get(task.category, 0) + 1
     return render_template('dashboard.html', total=total, completed=completed, pending=pending,
-<<<<<<< HEAD
                            priorities=priorities, categories=categories, tasks=tasks)
-=======
-                           priorities=priorities, categories=categories, tasks=tasks, now=datetime.utcnow())
->>>>>>> f3724b3 (Modification to original dork code)
 
 @app.route('/tasks', methods=['GET', 'POST'])
 @login_required
@@ -265,4 +278,3 @@ if __name__ == '__main__':
     # Development: debug=True, Production: debug=False
     is_production = os.environ.get('FLASK_ENV') == 'production'
     app.run(debug=not is_production, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
->>>>>>> f3724b3 (Modification to original dork code)
