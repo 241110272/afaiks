@@ -7,13 +7,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from flask import Flask, render_template, redirect, url_for, flash, request, send_file
+from flask import Flask, render_template, redirect, url_for, flash, send_file
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
+from dotenv import load_dotenv
 
 from config import Config
 from forms import FilterForm, LoginForm, RegisterForm, TaskForm
-from models import Task, User, db
+from models import Task, User, db, utc_now
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -121,7 +125,7 @@ def dashboard():
         priorities[task.priority] = priorities.get(task.priority, 0) + 1
         categories[task.category] = categories.get(task.category, 0) + 1
     return render_template('dashboard.html', total=total, completed=completed, pending=pending,
-                           priorities=priorities, categories=categories, tasks=tasks, now=datetime.utcnow())
+                           priorities=priorities, categories=categories, tasks=tasks, now=utc_now())
 
 @app.route('/tasks', methods=['GET', 'POST'])
 @login_required
@@ -258,7 +262,7 @@ def export_pdf():
 @app.route('/notify')
 @login_required
 def notify():
-    overdue_tasks = Task.query.filter(Task.owner_id == current_user.id, Task.deadline < datetime.utcnow(), Task.status == 'Pending').all()
+    overdue_tasks = Task.query.filter(Task.owner_id == current_user.id, Task.deadline < utc_now(), Task.status == 'Pending').all()
     if not overdue_tasks:
         flash('Tidak ada tugas overdue yang perlu dinotifikasi.', 'info')
         return redirect(url_for('dashboard'))

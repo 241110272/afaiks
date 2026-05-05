@@ -1,8 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
+def utc_now():
+    """Return current UTC time with timezone info"""
+    return datetime.now(timezone.utc)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,7 +28,7 @@ class Task(db.Model):
     status = db.Column(db.String(20), default='Pending')
     category = db.Column(db.String(100), default='General')
     tags = db.Column(db.String(200), default='')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     assigned_to_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     shared = db.Column(db.Boolean, default=False)

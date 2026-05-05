@@ -93,18 +93,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
 const chartData = {
     completed: {{ completed }},
     pending: {{ pending }},
     priorities: {
-        'Low': {{ priorities.get('Low', 0) }},
-        'Medium': {{ priorities.get('Medium', 0) }},
-        'High': {{ priorities.get('High', 0) }}
+        Low: {{ priorities.get('Low', 0) }},
+        Medium: {{ priorities.get('Medium', 0) }},
+        High: {{ priorities.get('High', 0) }}
     },
     categories: {
-        {% for key, value in categories.items() -%}
-        '{{ key }}': {{ value }}{% if not loop.last %},{% endif %}
-        {% endfor -%}
+        {% for key, value in categories.items() %}
+        "{{ key }}": {{ value }}{% if not loop.last %},{% endif %}
+        {% endfor %}
     }
 };
 
