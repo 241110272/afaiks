@@ -121,7 +121,7 @@ def dashboard():
         priorities[task.priority] = priorities.get(task.priority, 0) + 1
         categories[task.category] = categories.get(task.category, 0) + 1
     return render_template('dashboard.html', total=total, completed=completed, pending=pending,
-                           priorities=priorities, categories=categories, tasks=tasks)
+                           priorities=priorities, categories=categories, tasks=tasks, now=datetime.utcnow())
 
 @app.route('/tasks', methods=['GET', 'POST'])
 @login_required

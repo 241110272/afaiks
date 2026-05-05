@@ -93,6 +93,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+const chartData = {
+    completed: {{ completed }},
+    pending: {{ pending }},
+    priorities: {
+        'Low': {{ priorities.get('Low', 0) }},
+        'Medium': {{ priorities.get('Medium', 0) }},
+        'High': {{ priorities.get('High', 0) }}
+    },
+    categories: {
+        {% for key, value in categories.items() %}'{{ key }}': {{ value }}{{ "," if not loop.last else "" }}{% endfor %}
+    }
+};
+
 const chartColors = {
     primary: '#2563eb',
     success: '#10b981',
@@ -101,64 +114,75 @@ const chartColors = {
     info: '#06b6d4'
 };
 
-// Status Chart
-const statusCtx = document.getElementById('statusChart').getContext('2d');
-new Chart(statusCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Selesai', 'Pending'],
-        datasets: [{
-            data: [{{ completed }}, {{ pending }}],
-            backgroundColor: [chartColors.success, chartColors.warning],
-            borderColor: '#fff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: { legend: { position: 'bottom' } }
+document.addEventListener('DOMContentLoaded', function() {
+    // Status Chart
+    if (document.getElementById('statusChart')) {
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Selesai', 'Pending'],
+                datasets: [{
+                    data: [chartData.completed, chartData.pending],
+                    backgroundColor: [chartColors.success, chartColors.warning],
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
     }
-});
 
-// Priority Chart
-const priorityCtx = document.getElementById('priorityChart').getContext('2d');
-new Chart(priorityCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Low', 'Medium', 'High'],
-        datasets: [{
-            label: 'Jumlah Tugas',
-            data: [{{ priorities.get('Low', 0) }}, {{ priorities.get('Medium', 0) }}, {{ priorities.get('High', 0) }}],
-            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-            borderRadius: 5
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        indexAxis: 'y',
-        scales: { x: { beginAtZero: true } }
+    // Priority Chart
+    if (document.getElementById('priorityChart')) {
+        const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+        new Chart(priorityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Low', 'Medium', 'High'],
+                datasets: [{
+                    label: 'Jumlah Tugas',
+                    data: [chartData.priorities.Low, chartData.priorities.Medium, chartData.priorities.High],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
     }
-});
 
-// Category Chart
-const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-new Chart(categoryCtx, {
-    type: 'bar',
-    data: {
-        labels: [{% for category in categories.keys() %}'{{ category }}'{{ ", " if not loop.last else "" }}{% endfor %}],
-        datasets: [{
-            label: 'Tugas per Kategori',
-            data: [{% for value in categories.values() %}{{ value }}{{ ", " if not loop.last else "" }}{% endfor %}],
-            backgroundColor: [chartColors.primary, chartColors.success, chartColors.danger, chartColors.warning, chartColors.info],
-            borderRadius: 5
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        indexAxis: 'x',
-        scales: { y: { beginAtZero: true } }
+    // Category Chart
+    if (document.getElementById('categoryChart')) {
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryLabels = Object.keys(chartData.categories);
+        const categoryValues = Object.values(chartData.categories);
+        
+        new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: 'Tugas per Kategori',
+                    data: categoryValues,
+                    backgroundColor: [chartColors.primary, chartColors.success, chartColors.danger, chartColors.warning, chartColors.info],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'x',
+                scales: { y: { beginAtZero: true } }
+            }
+        });
     }
 });
 </script>
