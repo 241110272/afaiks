@@ -93,31 +93,30 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-
-const chartData = {
-    completed: {{ completed }},
-    pending: {{ pending }},
-    priorities: {
-        Low: {{ priorities.get('Low', 0) }},
-        Medium: {{ priorities.get('Medium', 0) }},
-        High: {{ priorities.get('High', 0) }}
-    },
-    categories: {
-        {% for key, value in categories.items() %}
-        "{{ key }}": {{ value }}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    }
-};
-
-const chartColors = {
-    primary: '#2563eb',
-    success: '#10b981',
-    danger: '#ef4444',
-    warning: '#f59e0b',
-    info: '#06b6d4'
-};
-
 document.addEventListener('DOMContentLoaded', function() {
+    const chartColors = {
+        primary: '#2563eb',
+        success: '#10b981',
+        danger: '#ef4444',
+        warning: '#f59e0b',
+        info: '#06b6d4'
+    };
+
+    const chartData = {
+        completed: {{ completed }},
+        pending: {{ pending }},
+        priorities: {
+            Low: {{ priorities.get('Low', 0) }},
+            Medium: {{ priorities.get('Medium', 0) }},
+            High: {{ priorities.get('High', 0) }}
+        },
+        categories: {
+            {%- for key, value in categories.items() %}
+            "{{ key }}": {{ value }}{{ "," if not loop.last else "" }}
+            {%- endfor %}
+        }
+    };
+
     // Status Chart
     if (document.getElementById('statusChart')) {
         const statusCtx = document.getElementById('statusChart').getContext('2d');
@@ -168,24 +167,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryLabels = Object.keys(chartData.categories);
         const categoryValues = Object.values(chartData.categories);
         
-        new Chart(categoryCtx, {
-            type: 'bar',
-            data: {
-                labels: categoryLabels,
-                datasets: [{
-                    label: 'Tugas per Kategori',
-                    data: categoryValues,
-                    backgroundColor: [chartColors.primary, chartColors.success, chartColors.danger, chartColors.warning, chartColors.info],
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                indexAxis: 'x',
-                scales: { y: { beginAtZero: true } }
-            }
-        });
+        if (categoryLabels.length > 0) {
+            new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Tugas per Kategori',
+                        data: categoryValues,
+                        backgroundColor: [chartColors.primary, chartColors.success, chartColors.danger, chartColors.warning, chartColors.info],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'x',
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
     }
 });
 </script>
