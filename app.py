@@ -104,7 +104,11 @@ def dashboard():
         priorities[task.priority] = priorities.get(task.priority, 0) + 1
         categories[task.category] = categories.get(task.category, 0) + 1
     return render_template('dashboard.html', total=total, completed=completed, pending=pending,
+<<<<<<< HEAD
                            priorities=priorities, categories=categories, tasks=tasks)
+=======
+                           priorities=priorities, categories=categories, tasks=tasks, now=datetime.utcnow())
+>>>>>>> f3724b3 (Modification to original dork code)
 
 @app.route('/tasks', methods=['GET', 'POST'])
 @login_required
@@ -258,4 +262,7 @@ def notify():
 
 if __name__ == '__main__':
     create_database()
-    app.run(debug=True)
+    # Development: debug=True, Production: debug=False
+    is_production = os.environ.get('FLASK_ENV') == 'production'
+    app.run(debug=not is_production, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+>>>>>>> f3724b3 (Modification to original dork code)

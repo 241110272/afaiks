@@ -1,28 +1,73 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard - AFAIKs{% endblock %}
 {% block content %}
-<h1>Dashboard</h1>
+<h1>Dashboard Produktivitas</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Total Tugas</div>
+        <div class="value">{{ total }}</div>
+    </div>
+    <div class="stat-card completed">
+        <div class="label">Selesai</div>
+        <div class="value">{{ completed }}</div>
+    </div>
+    <div class="stat-card pending">
+        <div class="label">Pending</div>
+        <div class="value">{{ pending }}</div>
+    </div>
+    <div class="stat-card high">
+        <div class="label">Tinggi</div>
+        <div class="value">{{ priorities.get('High', 0) }}</div>
+    </div>
+</div>
+
 <div class="card-grid">
-    <div class="card small-card"><strong>Total Tugas</strong><span>{{ total }}</span></div>
-    <div class="card small-card"><strong>Selesai</strong><span>{{ completed }}</span></div>
-    <div class="card small-card"><strong>Pending</strong><span>{{ pending }}</span></div>
+    <div class="card">
+        <h2>Status Tugas</h2>
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Distribusi Prioritas</h2>
+        <div class="chart-container">
+            <canvas id="priorityChart"></canvas>
+        </div>
+    </div>
 </div>
+
 <div class="card">
-    <h2>Ringkasan Prioritas</h2>
-    <ul class="summary-list">
-        {% for label, value in priorities.items() %}
-            <li>{{ label }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+    <h2>Tugas Berdasarkan Kategori</h2>
+    <div class="chart-container" style="height: 400px;">
+        <canvas id="categoryChart"></canvas>
+    </div>
 </div>
+
 <div class="card">
-    <h2>Ringkasan Kategori</h2>
-    <ul class="summary-list">
-        {% for label, value in categories.items() %}
-            <li>{{ label }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+    <h2>Tugas Overdue</h2>
+    <table>
+        <thead><tr><th>Judul</th><th>Deadline</th><th>Prioritas</th><th>Kategori</th></tr></thead>
+        <tbody>
+            {% set overdue_tasks = [] %}
+            {% for task in tasks %}
+                {% if task.deadline and task.deadline < now and task.status == 'Pending' %}
+                    {% set _ = overdue_tasks.append(task) %}
+                    <tr>
+                        <td><strong>{{ task.title }}</strong></td>
+                        <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ task.priority }}</td>
+                        <td>{{ task.category }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            {% if not overdue_tasks %}
+                <tr><td colspan="4">Tidak ada tugas overdue.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
 </div>
+
 <div class="card">
     <h2>Tugas Terbaru</h2>
     <table>
@@ -45,4 +90,76 @@
         <a class="button secondary" href="{{ url_for('notify') }}">Kirim Notifikasi Email</a>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const chartColors = {
+    primary: '#2563eb',
+    success: '#10b981',
+    danger: '#ef4444',
+    warning: '#f59e0b',
+    info: '#06b6d4'
+};
+
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Selesai', 'Pending'],
+        datasets: [{
+            data: [{{ completed }}, {{ pending }}],
+            backgroundColor: [chartColors.success, chartColors.warning],
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+// Priority Chart
+const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+new Chart(priorityCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Low', 'Medium', 'High'],
+        datasets: [{
+            label: 'Jumlah Tugas',
+            data: [{{ priorities.get('Low', 0) }}, {{ priorities.get('Medium', 0) }}, {{ priorities.get('High', 0) }}],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        indexAxis: 'y',
+        scales: { x: { beginAtZero: true } }
+    }
+});
+
+// Category Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for category in categories.keys() %}'{{ category }}'{{ ", " if not loop.last else "" }}{% endfor %}],
+        datasets: [{
+            label: 'Tugas per Kategori',
+            data: [{% for value in categories.values() %}{{ value }}{{ ", " if not loop.last else "" }}{% endfor %}],
+            backgroundColor: [chartColors.primary, chartColors.success, chartColors.danger, chartColors.warning, chartColors.info],
+            borderRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        indexAxis: 'x',
+        scales: { y: { beginAtZero: true } }
+    }
+});
+</script>
 {% endblock %}

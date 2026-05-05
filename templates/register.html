@@ -3,16 +3,40 @@
 {% block content %}
 <div class="card auth-card">
     <h2>Register</h2>
-    <form method="post">
+    <form method="post" novalidate>
         {{ form.hidden_tag() }}
         <label for="username">Username</label>
         {{ form.username(class='input-field') }}
+        {% if form.username.errors %}
+            <div class="error-message">
+                {% for error in form.username.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+        
         <label for="email">Email</label>
         {{ form.email(class='input-field') }}
+        {% if form.email.errors %}
+            <div class="error-message">
+                {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+        
         <label for="password">Password</label>
         {{ form.password(class='input-field') }}
+        {% if form.password.errors %}
+            <div class="error-message">
+                {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+        
         <label for="confirm_password">Confirm Password</label>
         {{ form.confirm_password(class='input-field') }}
+        {% if form.confirm_password.errors %}
+            <div class="error-message">
+                {% for error in form.confirm_password.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+        
         {{ form.submit(class='button') }}
     </form>
     <p>Sudah punya akun? <a href="{{ url_for('login') }}">Masuk</a>.</p>
