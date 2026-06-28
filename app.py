@@ -256,6 +256,9 @@ def notify():
         flash('Gagal mengirim email. Periksa konfigurasi.', 'warning')
     return redirect(url_for('dashboard'))
 
+# Ensure tables are created when imported by Gunicorn
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    create_database()
     app.run(debug=True)
