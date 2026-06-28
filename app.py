@@ -258,6 +258,12 @@ def notify():
 
 # Ensure tables are created when imported by Gunicorn
 with app.app_context():
+    from sqlalchemy import text
+    try:
+        db.session.execute(text('ALTER TABLE "user" ALTER COLUMN password TYPE VARCHAR(256);'))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
     db.create_all()
 
 if __name__ == '__main__':
