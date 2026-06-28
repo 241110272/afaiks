@@ -1,27 +1,72 @@
 {% extends 'base.html' %}
-{% block title %}{{ title }} - AFAIKs{% endblock %}
+{% block title %}{{ title }} - Smart Notes{% endblock %}
 {% block content %}
-<div class="card">
-    <h1>{{ title }}</h1>
-    <form method="post" class="task-form">
+<div class="distraction-free-form">
+    <form method="post" id="note-form">
         {{ form.hidden_tag() }}
-        <label>Judul</label>
-        {{ form.title(class='input-field') }}
-        <label>Deskripsi</label>
-        {{ form.description(class='textarea-field') }}
-        <label>Deadline</label>
-        {{ form.deadline(class='input-field') }}
-        <label>Prioritas</label>
-        {{ form.priority(class='select-field') }}
-        <label>Status</label>
-        {{ form.status(class='select-field') }}
-        <label>Kategori</label>
-        {{ form.category(class='input-field') }}
-        <label>Tags</label>
-        {{ form.tags(class='input-field') }}
-        <label>Assign ke</label>
-        {{ form.assignee(class='select-field') }}
-        {{ form.submit(class='button') }}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <a href="{{ url_for('tasks') }}" style="color: var(--text-color); opacity: 0.6;">← Back</a>
+            {{ form.submit(class='button') }}
+        </div>
+        
+        {{ form.title(class='title-input', placeholder='Note Title...') }}
+        {{ form.description(class='textarea-field', placeholder='Write your notes here in Markdown... \nType #tag to auto-tag.', id='note-desc') }}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; padding: 1.5rem; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border);">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Notebook Category</label>
+                {{ form.category(class='input-field', placeholder='e.g., Work, Personal, Ideas') }}
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tags</label>
+                {{ form.tags(class='input-field', id='note-tags', placeholder='tags, comma, separated') }}
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Due Date (Optional)</label>
+                {{ form.deadline(class='input-field') }}
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Priority / Status</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    {{ form.priority(class='select-field', style='flex: 1;') }}
+                    {{ form.status(class='select-field', style='flex: 1;') }}
+                </div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Assign To (Collaboration)</label>
+                {{ form.assignee(class='select-field') }}
+            </div>
+        </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const descField = document.getElementById('note-desc');
+    const tagsField = document.getElementById('note-tags');
+    
+    if (descField && tagsField) {
+        descField.addEventListener('input', function() {
+            const text = descField.value;
+            const hashtags = text.match(/#[a-zA-Z0-9_]+/g);
+            if (hashtags) {
+                let currentTags = tagsField.value.split(',').map(t => t.trim()).filter(t => t);
+                
+                let updated = false;
+                hashtags.forEach(tag => {
+                    const cleanTag = tag.substring(1);
+                    if (!currentTags.includes(cleanTag)) {
+                        currentTags.push(cleanTag);
+                        updated = true;
+                    }
+                });
+                
+                if (updated) {
+                    tagsField.value = currentTags.join(', ');
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

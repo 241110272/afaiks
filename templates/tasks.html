@@ -1,47 +1,105 @@
 {% extends 'base.html' %}
-{% block title %}Tugas - AFAIKs{% endblock %}
+{% block title %}My Notes - Smart Notes AFAIKs{% endblock %}
 {% block content %}
-<h1>Daftar Tugas</h1>
 <div class="toolbar">
-    <a class="button" href="{{ url_for('new_task') }}">Tambah Tugas</a>
-    <a class="button secondary" href="{{ url_for('export_csv') }}">Export CSV</a>
-    <a class="button secondary" href="{{ url_for('export_pdf') }}">Export PDF</a>
+    <h1>My Notes</h1>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a class="button" href="{{ url_for('new_task') }}"><i class="ph ph-plus"></i> Create Note</a>
+        <a class="button secondary" href="{{ url_for('export_csv') }}"><i class="ph ph-file-csv"></i> CSV</a>
+        <a class="button secondary" href="{{ url_for('export_pdf') }}"><i class="ph ph-file-pdf"></i> PDF</a>
+    </div>
 </div>
-<div class="card">
-    <form method="post" class="filter-form">
-        {{ form.hidden_tag() }}
-        {{ form.search(class='input-field', placeholder='Cari judul atau deskripsi') }}
-        {{ form.category(class='input-field', placeholder='Kategori') }}
-        {{ form.priority(class='select-field') }}
-        {{ form.status(class='select-field') }}
-        {{ form.submit(class='button small') }}
-    </form>
+
+<div class="search-bar" style="margin-bottom: 2rem; max-width: 100%; position: relative;">
+    <i class="ph ph-magnifying-glass" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.25rem; color: #9ca3af;"></i>
+    <input type="text" id="live-search" class="input-field" placeholder="Search notes by title, content, or #tag..." style="border-radius: 999px; padding-left: 2.75rem; font-size: 1.1rem; box-shadow: var(--shadow);">
 </div>
-<div class="card">
-    <table>
-        <thead><tr><th>Judul</th><th>Kategori</th><th>Deadline</th><th>Prioritas</th><th>Status</th><th>Aksi</th></tr></thead>
-        <tbody>
-            {% for task in tasks %}
-                <tr>
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.category }}</td>
-                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
-                    <td>{{ task.priority }}</td>
-                    <td>{{ task.status }}</td>
-                    <td class="actions">
-                        <a class="button small" href="{{ url_for('edit_task', task_id=task.id) }}">Edit</a>
-                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" class="inline-form">
-                            <button type="submit" class="button small danger">Hapus</button>
-                        </form>
-                        <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="post" class="inline-form">
-                            <button type="submit" class="button small">Toggle</button>
-                        </form>
-                    </td>
-                </tr>
-            {% else %}
-                <tr><td colspan="6">Tidak ada tugas yang sesuai.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+<div class="notes-grid" id="notes-grid">
+    {% for task in tasks %}
+        <div class="note-card color-{{ task.category }} {% if task.priority == 'High' %}pinned{% endif %}" data-search="{{ task.title | lower }} {{ task.description | lower }} {{ task.category | lower }} {{ task.tags | lower }}">
+            <div class="note-actions">
+                <a class="button small" href="{{ url_for('edit_task', task_id=task.id) }}" title="Edit"><i class="ph ph-pencil-simple"></i></a>
+                <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="button small danger" onclick="return confirm('Delete this note?')" title="Delete"><i class="ph ph-trash"></i></button>
+                </form>
+                <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="button small secondary" title="Toggle Status">
+                        {% if task.status == 'Completed' %}
+                            <i class="ph ph-arrow-counter-clockwise"></i>
+                        {% else %}
+                            <i class="ph ph-check"></i>
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+            
+            <div class="note-title">{{ task.title }}</div>
+            
+            <div class="note-tags">
+                {% if task.tags %}
+                    {% for tag in task.tags.split(',') %}
+                        {% if tag.strip() %}
+                            <span class="tag">{{ tag.strip() }}</span>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <span class="tag" style="background: rgba(59, 130, 246, 0.1); color: var(--primary);">{{ task.category }}</span>
+            </div>
+            
+            <div class="note-content markdown-body" data-raw-md="{{ task.description or '' }}">
+            </div>
+            
+            <div class="note-meta">
+                <span class="note-date">{{ task.deadline.strftime('%b %d, %Y') if task.deadline else 'No deadline' }}</span>
+                <span class="note-analytics">Calculating...</span>
+            </div>
+        </div>
+    {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; opacity: 0.5;">
+            <h2>No notes found</h2>
+            <p>Your notes will appear here in a beautiful grid.</p>
+        </div>
+    {% endfor %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('live-search');
+    const noteCards = document.querySelectorAll('.note-card');
+    
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        noteCards.forEach(card => {
+            const searchableText = card.getAttribute('data-search');
+            if (searchableText.includes(term)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    const markdownElements = document.querySelectorAll('.markdown-body');
+    markdownElements.forEach(el => {
+        const rawMd = el.getAttribute('data-raw-md');
+        if (rawMd) {
+            el.innerHTML = marked.parse(rawMd, { breaks: true });
+            const textContent = el.innerText || el.textContent;
+            const words = textContent.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const chars = textContent.length;
+            const readTimeMin = Math.max(1, Math.ceil(words / 200));
+            
+            const metaSpan = el.parentElement.querySelector('.note-analytics');
+            if (metaSpan) {
+                metaSpan.innerText = `${words} words • ${readTimeMin} min read`;
+            }
+        } else {
+            el.innerHTML = '<span style="opacity: 0.5; font-style: italic;">Empty note</span>';
+            const metaSpan = el.parentElement.querySelector('.note-analytics');
+            if (metaSpan) metaSpan.innerText = `0 words`;
+        }
+    });
+});
+</script>
 {% endblock %}

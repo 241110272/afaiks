@@ -1,48 +1,73 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard - AFAIKs{% endblock %}
+{% block title %}Insights - Smart Notes{% endblock %}
 {% block content %}
-<h1>Dashboard</h1>
-<div class="card-grid">
-    <div class="card small-card"><strong>Total Tugas</strong><span>{{ total }}</span></div>
-    <div class="card small-card"><strong>Selesai</strong><span>{{ completed }}</span></div>
-    <div class="card small-card"><strong>Pending</strong><span>{{ pending }}</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1><i class="ph-duotone ph-chart-line-up" style="color: var(--primary);"></i> Notebook Insights</h1>
+    <a class="button" href="{{ url_for('new_task') }}"><i class="ph ph-plus"></i> New Note</a>
 </div>
-<div class="card">
-    <h2>Ringkasan Prioritas</h2>
-    <ul class="summary-list">
-        {% for label, value in priorities.items() %}
-            <li>{{ label }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+
+<div class="insight-grid">
+    <div class="insight-card">
+        <h3><i class="ph ph-files"></i> Total Notes</h3>
+        <div class="value">{{ total }}</div>
+    </div>
+    <div class="insight-card">
+        <h3><i class="ph ph-check-circle"></i> Completed / Archived</h3>
+        <div class="value" style="color: var(--cat-work);">{{ completed }}</div>
+    </div>
+    <div class="insight-card">
+        <h3><i class="ph ph-clock-countdown"></i> Actionable</h3>
+        <div class="value" style="color: var(--cat-urgent);">{{ pending }}</div>
+    </div>
 </div>
-<div class="card">
-    <h2>Ringkasan Kategori</h2>
-    <ul class="summary-list">
-        {% for label, value in categories.items() %}
-            <li>{{ label }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+
+<div class="notes-grid" style="column-count: 2;">
+    <div class="note-card">
+        <h2><i class="ph-fill ph-star" style="color: #f59e0b;"></i> Pinned & Priorities</h2>
+        <ul style="list-style: none; padding: 0;">
+            {% for label, value in priorities.items() %}
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+                    <span>Priority {{ label }}</span>
+                    <strong>{{ value }} notes</strong>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="note-card">
+        <h2><i class="ph-duotone ph-folder-open" style="color: var(--primary);"></i> Top Notebooks</h2>
+        <ul style="list-style: none; padding: 0;">
+            {% for label, value in categories.items() %}
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+                    <span class="tag" style="background: rgba(59, 130, 246, 0.1); color: var(--primary);">{{ label }}</span>
+                    <strong>{{ value }}</strong>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
-<div class="card">
-    <h2>Tugas Terbaru</h2>
+
+<div class="card" style="margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>Recently Modified</h2>
+        <a class="button small secondary" href="{{ url_for('tasks') }}"><i class="ph ph-list"></i> View All Notes</a>
+    </div>
     <table>
-        <thead><tr><th>Judul</th><th>Status</th><th>Deadline</th><th>Prioritas</th></tr></thead>
+        <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Last Date</th></tr></thead>
         <tbody>
-            {% for task in tasks[:8] %}
+            {% for task in tasks[:5] %}
                 <tr>
-                    <td>{{ task.title }}</td>
+                    <td><strong>{{ task.title }}</strong></td>
+                    <td><span class="tag">{{ task.category }}</span></td>
                     <td>{{ task.status }}</td>
-                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '-' }}</td>
-                    <td>{{ task.priority }}</td>
+                    <td style="opacity: 0.6;">{{ task.deadline.strftime('%b %d, %Y') if task.deadline else 'No date' }}</td>
                 </tr>
             {% else %}
-                <tr><td colspan="4">Tidak ada tugas.</td></tr>
+                <tr><td colspan="4">No recent notes.</td></tr>
             {% endfor %}
         </tbody>
     </table>
-    <div class="card-actions">
-        <a class="button" href="{{ url_for('tasks') }}">Lihat semua tugas</a>
-        <a class="button secondary" href="{{ url_for('notify') }}">Kirim Notifikasi Email</a>
+    <div style="margin-top: 1.5rem; text-align: right;">
+        <a class="button secondary" href="{{ url_for('notify') }}"><i class="ph ph-envelope-simple"></i> Send Overdue Notification</a>
     </div>
 </div>
 {% endblock %}
